@@ -1,0 +1,15 @@
+MessageStoreManager:消息管理存储器
+
+(1)类结构：
+MessageStoreManager{
+    private final ConcurrentHashMap<String/* topic */, ConcurrentHashMap<Integer/* partition */, MessageStore>> stores = new ConcurrentHashMap<String, ConcurrentHashMap<Integer, MessageStore>>();
+}
+通过一个stores对象保存所有的主题-分区-存储。
+
+(2)包含关系
+
+MessageStore 对应一个topic的存储
+
+MessageStore ->  SegmentList -> n Segment-> MessageSet(FileMessageSet)
+
+(3)

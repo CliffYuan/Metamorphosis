@@ -219,15 +219,15 @@ public class MetamorphosisWireFormatType extends WireFormatType {
                 // value totalLen opaque\r\n data
                 private Object decodeData(final IoBuffer buff, final String[] sa) {
                     this.assertCommand(sa[0], "value");
-                    final int valueLen = Integer.parseInt(sa[1]);
+                    final int valueLen = Integer.parseInt(sa[1]);//消息长度
                     if (buff.remaining() < valueLen) {
-                        buff.reset();
+                        buff.reset();//不处理
                         return null;
                     }
                     else {
                         final byte[] data = new byte[valueLen];
                         buff.get(data);
-                        return new DataCommand(data, Integer.parseInt(sa[2]));
+                        return new DataCommand(data, Integer.parseInt(sa[2]));//消息体 消息和请求id
                     }
                 }
 

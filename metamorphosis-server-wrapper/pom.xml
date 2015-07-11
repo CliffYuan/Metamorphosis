@@ -61,10 +61,10 @@
 			<groupId>com.taobao.metamorphosis</groupId>
 			<artifactId>metamorphosis-commons</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>com.taobao.metamorphosis</groupId>
-			<artifactId>metamorphosis-dashboard</artifactId>
-		</dependency>
+		<!--<dependency>-->
+			<!--<groupId>com.taobao.metamorphosis</groupId>-->
+			<!--<artifactId>metamorphosis-dashboard</artifactId>-->
+		<!--</dependency>-->
 		<dependency>
 			<groupId>com.taobao.metamorphosis</groupId>
 			<artifactId>metamorphosis-tools</artifactId>
@@ -101,7 +101,7 @@
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 			<version>2.1</version>
-			<scope>test</scope>
+			<!--<scope>test</scope>-->
 		</dependency>
 	</dependencies>
 </project>

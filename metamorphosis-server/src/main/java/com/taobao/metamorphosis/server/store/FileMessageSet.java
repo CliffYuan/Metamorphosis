@@ -46,9 +46,9 @@ import com.taobao.metamorphosis.utils.MessageUtils;
  */
 public class FileMessageSet implements MessageSet, Closeable {
 
-    private final FileChannel channel;
-    private final AtomicLong messageCount;
-    private final AtomicLong sizeInBytes;
+    private final FileChannel channel; //文件通道
+    private final AtomicLong messageCount;//内容数量
+    private final AtomicLong sizeInBytes; //已经写入缓存的水位，flush后highWaterMark=sizeInBytes
     private final AtomicLong highWaterMark; // 已经确保写入磁盘的水位
     private final long offset; // 镜像offset
     private boolean mutable; // 是否可变
@@ -75,7 +75,7 @@ public class FileMessageSet implements MessageSet, Closeable {
         }
         else {
             try {
-                this.sizeInBytes.set(Math.min(channel.size(), limit) - offset);
+                this.sizeInBytes.set(Math.min(channel.size(), limit) - offset);//todo 为啥？
                 this.highWaterMark.set(this.sizeInBytes.get());
             }
             catch (final Exception e) {

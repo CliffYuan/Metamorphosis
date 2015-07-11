@@ -29,12 +29,13 @@
   <modules>
 	<module>metamorphosis-client</module>
 	<module>metamorphosis-tools</module>
-	<module>metamorphosis-storm-spout</module>
+	<!--<module>metamorphosis-storm-spout</module>-->
 	<module>metamorphosis-client-extension</module>
 	<module>metamorphosis-server</module>
-	<module>metamorphosis-dashboard</module>
+	<!--<module>metamorphosis-dashboard</module>-->
 	<module>metamorphosis-commons</module>
 	<module>metamorphosis-server-wrapper</module>
+    <module>metamorphosis-example</module>
   </modules>
     <properties>
         <project.build.sourceEncoding>GBK</project.build.sourceEncoding>
@@ -199,7 +200,7 @@
 	  <dependency>
 		<groupId>com.taobao.gecko</groupId>
 		<artifactId>gecko</artifactId>
-		<version>1.1.5-SNAPSHOT</version>
+		<version>1.1.4</version>
 	  </dependency>
 	  <dependency>
 		<groupId>com.taobao.notify</groupId>

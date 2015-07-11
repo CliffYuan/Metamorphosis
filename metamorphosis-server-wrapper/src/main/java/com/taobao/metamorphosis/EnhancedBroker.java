@@ -23,7 +23,7 @@ import java.util.Properties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.github.killme2008.metamorphosis.dashboard.Server;
+//import com.github.killme2008.metamorphosis.dashboard.Server;
 import com.taobao.metamorphosis.server.assembly.MetaMorphosisBroker;
 import com.taobao.metamorphosis.server.utils.MetaConfig;
 
@@ -48,8 +48,8 @@ public class EnhancedBroker {
         // 先启动meta,然后启动Plugins
         this.broker.start();
         this.brokerPlugins.start();
-        Server dashboradHttpServer = new Server();
-        this.jettyServer = dashboradHttpServer.start(this.broker);
+//        Server dashboradHttpServer = new Server();
+//        this.jettyServer = dashboradHttpServer.start(this.broker);
     }
 
 

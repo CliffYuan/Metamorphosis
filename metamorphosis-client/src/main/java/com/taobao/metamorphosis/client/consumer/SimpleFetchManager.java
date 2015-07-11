@@ -224,7 +224,7 @@ public class SimpleFetchManager implements FetchManager {
 
         void processRequest(final FetchRequest request) {
             try {
-                final MessageIterator iterator = SimpleFetchManager.this.consumer.fetch(request, -1, null);
+                final MessageIterator iterator = SimpleFetchManager.this.consumer.fetch(request, -1, null);//下载数据
                 final MessageListener listener =
                         SimpleFetchManager.this.consumer.getMessageListener(request.getTopic());
                 final ConsumerMessageFilter filter =
@@ -407,12 +407,12 @@ public class SimpleFetchManager implements FetchManager {
                     if (this.isProcessed(msg.getId(), group)) {
                         continue;
                     }
-                    MessageAccessor.setPartition(msg, partition);
+                    MessageAccessor.setPartition(msg, partition);//设置分区
                     boolean accept = this.isAcceptable(request, filter, group, msg);
                     if (accept) {
                         currentTopicRegInfo.set(request.getTopicPartitionRegInfo().clone(it));
                         try {
-                            listener.recieveMessages(msg);
+                            listener.recieveMessages(msg);//调用用户listener消费消息
                         }
                         finally {
                             currentTopicRegInfo.remove();
@@ -420,7 +420,7 @@ public class SimpleFetchManager implements FetchManager {
                     }
                     // rollback message if it is in rollback only state.
                     if (MessageAccessor.isRollbackOnly(msg)) {
-                        it.setOffset(prevOffset);
+                        it.setOffset(prevOffset);//回滚offset
                         break;
                     }
                     if (partition.isAutoAck()) {
@@ -458,7 +458,7 @@ public class SimpleFetchManager implements FetchManager {
                 catch (final InvalidMessageException e) {
                     MetaStatLog.addStat(null, StatConstants.INVALID_MSG_STAT, request.getTopic());
                     // 消息体非法，获取有效offset，重新发起查询
-                    this.getOffsetAddRequest(request, e);
+                    this.getOffsetAddRequest(request, e);//查询和设置有效的offset。
                     return true;
                 }
                 catch (final Throwable e) {

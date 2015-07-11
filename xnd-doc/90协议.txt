@@ -1,0 +1,59 @@
+
+
+1)消息格式，也是存储在服务器上的格式：
+    消息头：
+        20个字节的头部
+        message length(4 bytes),including attribute and payload
+        checksum(4 bytes)
+        message id(8 bytes)
+        message flag(4 bytes)
+    消息体
+        payload
+
+     * <ul>
+     * <li>4个字节的消息数据长度（可能包括属性）</li>
+     * <li>4个字节的check sum</li>
+     * <li>8个字节的消息id</li>
+     * <li>4个字节的flag</li>
+     * <li>消息数据，如果有属性，则为：
+     * <ul>
+     * <li>4个字节的属性长度+ 消息属性 + payload</li>
+     * </ul>
+     * </li> 否则为：
+     * <ul>
+     * <li>payload</li>
+     * <ul>
+     * </li>
+     * </ul>
+
+2)通信协议,消费者和生产者与Broker服务器交互的通信协议：
+    1.请求
+        a.获取消息协议
+            协议格式：get topic group partition offset maxSize opaque\r\n
+            协议实现：GetCommand
+        b.查询服务器版本，也用于心跳检测
+            协议格式：version opaque\r\n
+            协议实现：VersionCommand
+        c.查询最近有效的offset
+            协议格式：offset topic group partition offset opaque\r\n
+            协议实现：OffsetCommand
+        d.发送消息命令
+            协议格式：put topic partition value-length flag checksum [transactionkey] opaque\r\n data
+            协议实现：PutCommand
+            说   明：data的结构如下：attribute(0个或者1个，固定长度字符串，取决于flag字段) + binary data
+        e.同步复制，master/slave复制消息的协议
+            协议格式：sync topic partition value-length flag msgId checksum opaque\r\n data
+            协议实现：SyncCommand
+        f.退出命令，客户端发送此命令后，服务器将主动关闭连接
+            协议格式：quit\r\n
+            协议实现：QuitCommand
+        j.统计信息查询
+            协议格式：stats item opaque\r\n
+            协议实现：StatsCommand
+    2.响应
+        a.数据应答命令
+            协议格式：value total-length opaque\r\n data
+            协议实现：DataCommand
+        b.通信应答命令
+            协议格式：result code length opaque\r\n message
+            协议实现：BooleanCommand

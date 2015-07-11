@@ -1,0 +1,100 @@
+
+
+1.解析配置
+ServerStartup
+    main()
+    getMetaConfig()
+
+2.构造对象(构造核心对象MetaMorphosisBroker)
+EnhancedBroker()
+    MetaMorphosisBroker()
+        1.构造RemotingServer
+        2.构造ExecutorsManager[GetProcess线程池，PutProcess线程池]
+        3.构造IdWorker
+        4.构造文件删除策略DeletePolicy
+        5.构造文件存储管理MessageStoreManager
+        6.构造统计管理MessageStoreManager
+        7.初始化zk管理BrokerZooKeeper
+            7.1.连接zookeeper
+        8.构造事务JournalTransactionStore
+        9.构造消费者过滤管理器ConsumerFilterManager
+       10.构造核心处理器BrokerCommandProcessor
+       11.构造事务处理器TransactionalCommandProcessor
+       12.注册JMX
+3.启动
+MetaMorphosisBroker.start()
+    1.存储器初始化
+    2.统计初始化
+    3.注册gecko处理器
+    4.启动gecko服务
+
+
+4.注册zookeeper信息
+    1.注册broker节点信息
+        /meta/brokers/ids/0/master        >meta://172.16.136.153:8123                --临时节点
+        /meta/brokers/ids/0/master_config_checksum                                   --临时节点
+
+    2.注册topic信息
+        /meta/brokers/topics-pub/test/0-m >{"broker":"0-m","numParts":2}             --临时节点
+        /meta/brokers/topics-sub/test/0-m >{"broker":"0-m","numParts":2}             --临时节点
+
+
+
+4.MessageStoreManager构造
+    1.初始化topic文件删除策略。
+    2.添加topics和unflushInterval变更监听。
+    3.构造topic正则集合。
+    4.初始化定时flush文件的任务和定时删除文件对象。
+    5.根据unflushInterval集合列表添加flush定时任务。
+
+    public MessageStoreManager(final MetaConfig metaConfig, final DeletePolicy deletePolicy) {
+            super();
+            this.metaConfig = metaConfig;
+            this.deletePolicy = deletePolicy;
+            this.newDeletePolicySelector();
+            this.metaConfig.addPropertyChangeListener("topics", new PropertyChangeListener() {
+                @Override
+                public void propertyChange(final PropertyChangeEvent evt) {
+                    MessageStoreManager.this.makeTopicsPatSet();
+                    MessageStoreManager.this.newDeletePolicySelector();
+                    MessageStoreManager.this.rescheduleDeleteJobs();
+                }
+            });
+
+            this.metaConfig.addPropertyChangeListener("unflushInterval", new PropertyChangeListener() {
+                @Override
+                public void propertyChange(final PropertyChangeEvent evt) {
+                    MessageStoreManager.this.scheduleFlushTask();
+                }
+            });
+
+            this.makeTopicsPatSet();
+
+            this.initScheduler(); //初始化定时flush文件的任务，初始化定时删除文件对象
+
+            // 定时flush
+            this.scheduleFlushTask();//根据unflushInterval集合列表添加flush定时任务。
+
+    }
+
+5.MessageStoreManager初始化
+    1.加载已有metaq文件数据。
+    2.启动定时删除文件任务。
+
+    @Override
+    public void init() {
+        // 加载已有数据并校验
+        try {
+            this.loadMessageStores(this.metaConfig);
+        }
+        catch (final IOException e) {
+            log.error("load message stores failed", e);
+            throw new MetamorphosisServerStartupException("Initilize message store manager failed", e);
+        }
+        catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        this.startScheduleDeleteJobs();//启动定时删除文件任务
+    }
+

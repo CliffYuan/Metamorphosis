@@ -1,0 +1,37 @@
+
+Zk中有4中类型的根目录，分别是:
+
+一：客户端
+1) /consumers:存放消费者列表以及消费记录，消费者列表主要是以组的方式存在，结构主要如下：
+    /consumers/xxGroup/ids/xxConsumerId：DATA(“：”后的DATA表示节点xxConsumerId对应的数据) 组内消费者Id;DATA为订阅主题列表，以”,”分隔
+    /consumers/xxGroup/offsets/xxTopic/分区N：DATA  组内主题分区N的消费进度；DATA为topic下分区N具体进度值
+    /consumers/xxGroup/owners/xxTopic/分区N：DATA 组内主题分区N的的消费者；DATA为消费者ID，表示XXTopic下分区N的数据由指定的消费者进行消费
+
+    如：
+        /meta/consumers/orion-group/ids/orion-group_192.168.17.44-32640-1429515415534-1 > ORION                                                     --临时节点
+
+        /meta/consumers/orion-group/owners/ORION-APPS/200-0                             >orion-group_192.168.19.141-27968-1429515305852-1           --临时节点
+        /meta/consumers/orion-group/owners/ORION-APPS/200-1                             >orion-group_192.168.19.141-27968-1429515305852-1           --临时节点
+
+
+二：服务端Broker
+2) /brokers/ids:存放Broker列表，如果Broker与Zookeeper失去连接，则会自动注销在/brokers/ids下的broker记录，例子如下：
+    /brokers/ids/xxBroker
+    如：
+        /meta/brokers/ids/0/master        >meta://172.16.136.153:8123                --临时节点
+        /meta/brokers/ids/0/master_config_checksum                                   --临时节点
+
+
+3) /brokers/topics-pub：存放发布的主题列表以及对应的可发送消息的Broker列表，例子如下：
+    /brokers/topics-pub/xxTopic/xxBroker
+    /brokers/topics-pub下记录的是可发送消息到xxTopic的Broker列表，意味着有多少个Broker允许存储Client发送到Topic数据
+    如：
+        /meta/brokers/topics-pub/test/0-m >{"broker":"0-m","numParts":2}             --临时节点
+
+
+
+4) /brokers/topics-sub：存放订阅的主题列表以及对应可订阅的Broker列表，例子如下：
+    /brokers/topics-sub/xxTopic/xxBroker
+    /brokers/topics-sub下记录的可订阅xxTopic的Broker列表，意味着有多少个Broker允许被Client订阅topic的数据
+    如：
+        /meta/brokers/topics-sub/test/0-m >{"broker":"0-m","numParts":2}             --临时节点

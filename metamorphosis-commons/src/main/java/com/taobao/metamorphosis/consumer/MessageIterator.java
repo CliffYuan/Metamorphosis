@@ -115,9 +115,9 @@ public class MessageIterator {
         }
         final MessageUtils.DecodedMessage decodeMessage =
                 MessageUtils.decodeMessage(this.topic, this.data, this.offset);
-        this.setOffset(decodeMessage.newOffset);
+        this.setOffset(decodeMessage.newOffset);//更新offset
         this.message = decodeMessage.message;
-        this.currentMsgBuf = decodeMessage.buf;
+        this.currentMsgBuf = decodeMessage.buf;//当前message的buf
         return decodeMessage.message;
     }
 

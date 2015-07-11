@@ -176,17 +176,24 @@ public class ProducerZooKeeper implements ZkClientChangedListener {
             this.syncedUpdateBrokersInfo();
         }
 
-
+        /**
+         * 同步BrokersInfo对象（内存和zk中数据一致），
+         * 包括:brokerid<->brokerUrl
+         *     topic<->List<Partition>
+         *
+         * @throws NotifyRemotingException
+         * @throws InterruptedException
+         */
         void syncedUpdateBrokersInfo() throws NotifyRemotingException, InterruptedException {
             this.lock.lock();
             try {
 
-                final Map<Integer, String> newBrokerStringMap =
-                        ProducerZooKeeper.this.metaZookeeper.getMasterBrokersByTopic(this.topic);
+                final Map<Integer/*brokerid*/, String/*brokerUrl*/> newBrokerStringMap =
+                        ProducerZooKeeper.this.metaZookeeper.getMasterBrokersByTopic(this.topic);//查询发布该topic的master broker
                 final List<String> topics = new ArrayList<String>(1);
                 topics.add(this.topic);
-                final Map<String, List<Partition>> newTopicPartitionMap =
-                        ProducerZooKeeper.this.metaZookeeper.getPartitionsForTopicsFromMaster(topics);
+                final Map<String/*topic*/, List<Partition>> newTopicPartitionMap =
+                        ProducerZooKeeper.this.metaZookeeper.getPartitionsForTopicsFromMaster(topics);//查询该topic的所有分区
 
                 log.warn("Begin receiving broker changes for topic " + this.topic + ",broker ids:"
                         + newTopicPartitionMap);

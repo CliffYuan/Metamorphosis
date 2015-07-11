@@ -1,0 +1,15 @@
+idea或者eclipse运行metaq
+
+0.前提：
+注释
+       <dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.1</version>
+			<!--<scope>test</scope>-->
+		</dependency>
+
+1.启动类：
+com.taobao.metamorphosis.ServerStartup.main();
+2.启动命令
+java com.taobao.metamorphosis.ServerStartup -FjettyBroker=$BASE_DIR/conf/jettyBroker.properties -f /home/xiaoniudu/project_git/Metamorphosis/metamorphosis-server-wrapper/conf/server.ini

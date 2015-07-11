@@ -1,0 +1,33 @@
+
+发送消息核心4步：
+1)final MessageSessionFactory sessionFactory = new MetaMessageSessionFactory(initMetaConfig());// New session factory,强烈建议使用单例
+2)final MessageProducer producer = sessionFactory.createProducer(); // create producer,强烈建议使用单例
+3)MessageProducer.publish(topic);
+    1.同步BrokersInfo对象（内存和zk中数据一致），
+        包括:brokerid<->brokerUrl
+            topic<->List<Partition>
+4)producer.sendMessage(new Message(topic, line.getBytes()), new SendMessageCallback() {
+
+                    @Override
+                    public void onMessageSent(final SendResult result) {
+                        if (result.isSuccess()) {
+                            System.out.println("Send message successfully,sent to " + result.getPartition());
+
+                        }
+                        else {
+                            System.err.println("Send message failed,error message:" + result.getErrorMessage());
+                        }
+
+                    }
+
+
+                    @Override
+                    public void onException(final Throwable e) {
+                        e.printStackTrace();
+
+                    }
+                });
+    1.根据分区算法选择分区。
+    2.通过分区查找到broker。
+    3.构造PutCommand对象。
+    4.发送。

@@ -25,8 +25,8 @@ package com.taobao.metamorphosis.server.store;
  * 
  */
 public class Location {
-    protected final long offset;
-    protected final int length;
+    protected final long offset;//开始位置
+    protected final int length;//保存数据长度
 
     public static Location InvalidLocaltion = new Location(-1, -1);
 

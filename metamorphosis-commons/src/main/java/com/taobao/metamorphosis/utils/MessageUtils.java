@@ -31,9 +31,9 @@ import com.taobao.metamorphosis.network.PutCommand;
 public final class MessageUtils {
 
     public final static class DecodedMessage {
-        public final int newOffset;
-        public final Message message;
-        public final ByteBuffer buf;
+        public final int newOffset;//新的offset
+        public final Message message;//消息对象
+        public final ByteBuffer buf;//message对应的缓冲数据
 
 
         public DecodedMessage(final int newOffset, final Message message, final ByteBuffer buf) {
@@ -119,22 +119,22 @@ public final class MessageUtils {
     public static final DecodedMessage decodeMessage(final String topic, final byte[] data, final int offset)
             throws InvalidMessageException {
         final ByteBuffer buf = ByteBuffer.wrap(data, offset, HEADER_LEN);
-        final int msgLen = buf.getInt();
-        final int checksum = buf.getInt();
-        vailidateMessage(offset + HEADER_LEN, msgLen, checksum, data);
-        final long id = buf.getLong();
+        final int msgLen = buf.getInt();//数据长度
+        final int checksum = buf.getInt();//checksum
+        vailidateMessage(offset + HEADER_LEN, msgLen, checksum, data);//检测checksum是否相等
+        final long id = buf.getLong();//messageid
         // 取flag
-        final int flag = buf.getInt();
+        final int flag = buf.getInt();//flag
         String attribute = null;
-        int payLoadOffset = offset + HEADER_LEN;
-        int payLoadLen = msgLen;
+        int payLoadOffset = offset + HEADER_LEN;//数据开始的offset
+        int payLoadLen = msgLen;                //数据长度
         if (payLoadLen > MAX_READ_BUFFER_SIZE) {
             throw new InvalidMessageException("Too much long payload length:" + payLoadLen);
         }
         // 如果有属性，需要解析属性
         if (MessageFlagUtils.hasAttribute(flag)) {
             // 取4个字节的属性长度
-            final int attrLen = getInt(offset + HEADER_LEN, data);
+            final int attrLen = getInt(offset + HEADER_LEN, data);//属性长度
             // 取消息属性
             final byte[] attrData = new byte[attrLen];
             System.arraycopy(data, offset + HEADER_LEN + 4, attrData, 0, attrLen);
@@ -147,10 +147,10 @@ public final class MessageUtils {
         // 获取payload
         final byte[] payload = new byte[payLoadLen];
         System.arraycopy(data, payLoadOffset, payload, 0, payLoadLen);
-        final Message msg = new Message(topic, payload);
+        final Message msg = new Message(topic, payload);//组装消息
         MessageAccessor.setFlag(msg, flag);
-        msg.setAttribute(attribute);
-        MessageAccessor.setId(msg, id);
+        msg.setAttribute(attribute);//组装消息属性
+        MessageAccessor.setId(msg, id);//组装消息id
         return new DecodedMessage(payLoadOffset + payLoadLen, msg, ByteBuffer.wrap(data, offset, payLoadOffset
             + payLoadLen - offset));
     }

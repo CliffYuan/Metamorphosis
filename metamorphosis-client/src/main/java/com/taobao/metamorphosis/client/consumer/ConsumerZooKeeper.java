@@ -667,9 +667,9 @@ public class ConsumerZooKeeper implements ZkClientChangedListener {
         boolean rebalance() throws InterruptedException, Exception {
 
             final Map<String/* topic */, String/* consumerId */> myConsumerPerTopicMap =
-                    this.getConsumerPerTopic(this.consumerIdString);
-            final Cluster cluster = ConsumerZooKeeper.this.metaZookeeper.getCluster();
-            Map<String/* topic */, List<String>/* consumer list */> consumersPerTopicMap = null;
+                    this.getConsumerPerTopic(this.consumerIdString);//查询当前消费者消费的topic
+            final Cluster cluster = ConsumerZooKeeper.this.metaZookeeper.getCluster();//所有broker集群,包含slave和master
+            Map<String/* topic */, List<String>/* consumer list */> consumersPerTopicMap = null;//所有的topic和消费者列表
             try {
                 consumersPerTopicMap = this.getConsumersPerTopic(this.group);
             }
@@ -684,8 +684,8 @@ public class ConsumerZooKeeper implements ZkClientChangedListener {
                 return false;
             }
 
-            final Map<String, List<String>> partitionsPerTopicMap =
-                    this.getPartitionStringsForTopics(myConsumerPerTopicMap);
+            final Map<String/*topic*/, List<String>/*partition*/> partitionsPerTopicMap =
+                    this.getPartitionStringsForTopics(myConsumerPerTopicMap);//当前消费者消费topic和分区
 
             final Map<String/* topic */, String/* consumer id */> relevantTopicConsumerIdMap =
                     this.getRelevantTopicMap(myConsumerPerTopicMap, partitionsPerTopicMap,
@@ -730,7 +730,7 @@ public class ConsumerZooKeeper implements ZkClientChangedListener {
 
                 if (curConsumers == null) {
                     log.warn("Releasing partition ownerships for topic:" + topic);
-                    this.releasePartitionOwnership(topic);
+                    this.releasePartitionOwnership(topic);//删除/meta/consumers/××-group/owners/TOPIC/200-1(partition),即删除组分配的分区
                     this.topicRegistry.remove(topic);
                     log.warn("There are no consumers subscribe topic " + topic);
                     continue;
@@ -971,11 +971,11 @@ public class ConsumerZooKeeper implements ZkClientChangedListener {
          */
         protected Map<String, List<String>> getConsumersPerTopic(final String group) throws Exception, NoNodeException {
             final List<String> consumers =
-                    ZkUtils.getChildren(ConsumerZooKeeper.this.zkClient, this.dirs.consumerRegistryDir);
+                    ZkUtils.getChildren(ConsumerZooKeeper.this.zkClient, this.dirs.consumerRegistryDir);//所有消费者
             if (consumers == null) {
                 return Collections.emptyMap();
             }
-            final Map<String, List<String>> consumersPerTopicMap = new HashMap<String, List<String>>();
+            final Map<String, List<String>> consumersPerTopicMap = new HashMap<String, List<String>>();//topic<->list consumber
             for (final String consumer : consumers) {
                 final List<String> topics = this.getTopics(consumer);// 多个consumer同时在负载均衡时,这里可能会抛出NoNodeException，--wuhua
                 for (final String topic : topics) {

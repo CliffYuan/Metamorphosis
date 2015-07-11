@@ -32,25 +32,51 @@ import com.taobao.metamorphosis.server.network.SessionContext;
  * 
  */
 public interface MessageSet {
-
+    /**
+     * 获取一个消息集合
+     * @param offset
+     * @param limit
+     * @return
+     * @throws IOException
+     */
     public MessageSet slice(long offset, long limit) throws IOException;
 
 
     public void write(GetCommand getCommand, SessionContext ctx);
 
-
+    /**
+     * 存储一个消息，这时候还没有存储到磁盘，需要调用flush方法才能保证存储到磁盘
+     * @param buff
+     * @return
+     * @throws IOException
+     */
     public long append(ByteBuffer buff) throws IOException;
 
-
+    /**
+     * 提交到磁盘
+     * @throws IOException
+     */
     public void flush() throws IOException;
 
-
+    /**
+     * 读取消息
+     * @param bf
+     * @param offset
+     * @throws IOException
+     */
     public void read(final ByteBuffer bf, long offset) throws IOException;
 
-
+    /**
+     * 读取消息
+     * @param bf
+     * @throws IOException
+     */
     public void read(final ByteBuffer bf) throws IOException;
 
-
+    /**
+     * 集合消息数量
+     * @return
+     */
     public long getMessageCount();
 
 }

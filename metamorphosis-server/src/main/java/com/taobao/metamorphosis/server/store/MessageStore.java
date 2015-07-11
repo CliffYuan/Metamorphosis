@@ -233,7 +233,7 @@ public class MessageStore extends Thread implements Closeable {
         this.metaConfig = metaConfig;
         this.topic = topic;
         final TopicConfig topicConfig = this.metaConfig.getTopicConfig(this.topic);
-        String dataPath = metaConfig.getDataPath();
+        String dataPath = metaConfig.getDataPath();////当前分区的存储路径
         if (topicConfig != null) {
             dataPath = topicConfig.getDataPath();
         }

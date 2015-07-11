@@ -87,22 +87,22 @@ public class MessageStoreManager implements Service {
     private final ConcurrentHashMap<String/* topic */, ConcurrentHashMap<Integer/* partition */, MessageStore>> stores =
             new ConcurrentHashMap<String, ConcurrentHashMap<Integer, MessageStore>>();
     private final MetaConfig metaConfig;
-    private ScheduledThreadPoolExecutor scheduledExecutorService;// =
+    private ScheduledThreadPoolExecutor scheduledExecutorService;// = //调度服务，对不同的MessageStore实例flush，将数据提到到硬盘
     // Executors.newScheduledThreadPool(2);
     static final Log log = LogFactory.getLog(MessageStoreManager.class);
 
-    private final DeletePolicy deletePolicy;
+    private final DeletePolicy deletePolicy;//默认删除策略
 
-    private DeletePolicySelector deletePolicySelector;
+    private DeletePolicySelector deletePolicySelector;//删除策略选择器
 
     public static final int HALF_DAY = 1000 * 60 * 60 * 12;
 
     private final Set<Pattern> topicsPatSet = new HashSet<Pattern>();
 
     private final ConcurrentHashMap<Integer, ScheduledFuture<?>> unflushIntervalMap =
-            new ConcurrentHashMap<Integer, ScheduledFuture<?>>();
+            new ConcurrentHashMap<Integer, ScheduledFuture<?>>();//MessageStore的提交方式有两种：组提交和定时提交，unflushIntervalMap是存放定时提交的任务
 
-    private Scheduler scheduler;
+    private Scheduler scheduler;//定时调度器，用于定时调度删除任务
 
 
     public MessageStoreManager(final MetaConfig metaConfig, final DeletePolicy deletePolicy) {
@@ -131,7 +131,7 @@ public class MessageStoreManager implements Service {
         this.initScheduler();
 
         // 定时flush
-        this.scheduleFlushTask();
+        this.scheduleFlushTask();//添加定时任务
 
     }
 
@@ -467,7 +467,7 @@ public class MessageStoreManager implements Service {
             Thread.currentThread().interrupt();
         }
 
-        this.startScheduleDeleteJobs();
+        this.startScheduleDeleteJobs();//启动定时删除文件任务
     }
 
     //add by jenwang
